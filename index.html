@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Мои финансы</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Финансы">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#07040f">
+<meta name="color-scheme" content="dark">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" href="icon.png">
+<style>
+:root{
+  --bg:#07040f;--card:#14101f;--card2:#1b1530;--text:#f5f2ff;--muted:#8d86a8;--chip:#221b38;
+  --pri:#8b5cf6;--pri2:#6d28d9;--inc:#34d399;--exp:#fb7185;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg);scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100vh;color:var(--text);-webkit-font-smoothing:antialiased;
+  background:radial-gradient(120% 55% at 50% -8%,#2a1252 0%,rgba(7,4,15,0) 70%),var(--bg);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",Inter,"Segoe UI",Roboto,sans-serif;font-size:16px}
+#app{max-width:520px;margin:0 auto;padding:calc(14px + env(safe-area-inset-top,0px)) 14px 120px}
+button,input,select{font-family:inherit}
+.top{display:flex;align-items:center;justify-content:space-between;margin:6px 4px 16px}
+.top h1{font-size:30px;margin:0;font-weight:800;letter-spacing:-.02em}
+.k{font-size:13px;color:var(--muted);font-weight:600}
+.card{background:var(--card);border-radius:26px;padding:18px;margin-bottom:12px}
+.hero{background:linear-gradient(135deg,#7c3aed 0%,#5b21b6 55%,#2e1065 100%);border-radius:30px;padding:22px;box-shadow:0 20px 44px -22px rgba(124,58,237,.9);margin-bottom:12px}
+.hero .k{color:rgba(255,255,255,.72)}
+.hv{font-size:40px;font-weight:800;letter-spacing:-.03em;margin-top:4px;word-break:break-word}
+.accs{display:flex;gap:8px;overflow-x:auto;margin:14px -4px -4px;padding:0 4px 4px;scrollbar-width:none}
+.accs::-webkit-scrollbar{display:none}
+.ap{flex:none;background:rgba(255,255,255,.14);border-radius:16px;padding:9px 13px;font-size:13px}
+.ap span{display:block;opacity:.75}.ap b{font-size:15px}
+.big2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 4px}
+.bigbtn{border:0;border-radius:26px;padding:28px 8px;font-size:22px;font-weight:800}
+.bigbtn small{display:block;font-size:28px;font-weight:300;line-height:1;margin-bottom:6px}
+.b-inc{background:rgba(52,211,153,.13);color:var(--inc)}
+.b-exp{background:rgba(251,113,133,.13);color:var(--exp)}
+.crumb{color:var(--muted);font-size:14px;margin-bottom:10px}
+.crumb b{color:var(--text)}
+.amount{width:100%;border:0;background:transparent;color:var(--text);font-size:48px;font-weight:800;padding:6px 0;outline:none;letter-spacing:-.02em}
+.hint{color:var(--muted);font-size:13px;line-height:1.4}
+.btn{display:block;width:100%;border:0;background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff;padding:16px;border-radius:18px;font-size:17px;font-weight:700;margin-top:12px;box-shadow:0 12px 26px -14px rgba(139,92,246,.95)}
+.btn.ghost{background:var(--chip);color:var(--text);box-shadow:none;font-weight:600}
+.btn.danger{background:rgba(251,113,133,.14);color:var(--exp);box-shadow:none}
+.btn:disabled{opacity:.4}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.chip{border:0;background:var(--chip);color:var(--text);padding:11px 15px;border-radius:999px;font-size:15px}
+.chip.on{background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff;font-weight:700}
+input.txt,select.sel{width:100%;background:var(--chip);color:var(--text);border:0;border-radius:16px;padding:14px;font-size:16px;margin-top:6px;outline:none;-webkit-appearance:none;appearance:none}
+input.txt:focus,select.sel:focus{background:#2b2248}
+input[type=date].txt{min-height:48px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lbl{font-size:13px;color:var(--muted);margin-top:12px;font-weight:600}
+.seg{display:flex;background:var(--card);border-radius:16px;padding:4px;margin-bottom:12px}
+.seg button{flex:1;border:0;background:transparent;color:var(--muted);padding:10px 6px;border-radius:12px;font-size:15px;font-weight:700}
+.seg button.on{background:var(--chip);color:var(--text)}
+.month{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.month button{border:0;background:var(--card);color:var(--text);width:42px;height:42px;border-radius:14px;font-size:18px}
+.month b{font-size:18px;text-transform:capitalize}
+.sum{display:grid;grid-template-columns:1fr 1fr;gap:16px 10px}
+.sum .v{font-size:21px;font-weight:800;margin-top:2px;letter-spacing:-.02em}
+.pos{color:var(--inc)}.neg{color:var(--exp)}
+.legend{margin-top:12px}
+.lg{display:flex;align-items:center;gap:10px;padding:9px 0;font-size:15px}
+.lg i{width:11px;height:11px;border-radius:50%;flex:none}
+.lg .n{flex:1}.lg .p{color:var(--muted);font-size:13px;width:40px;text-align:right}
+.lg .a{font-weight:700;min-width:80px;text-align:right}
+.day{font-size:13px;color:var(--muted);margin:16px 6px 8px;font-weight:700}
+.tx{display:flex;align-items:center;gap:10px;background:var(--card);padding:13px 15px;border-radius:20px;margin-bottom:8px}
+.tx .m{flex:1;min-width:0}
+.tx .c{font-weight:700}
+.tx .nt{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx .s{font-weight:800;white-space:nowrap;text-align:right}
+.tx .s small{display:block;font-size:12px;font-weight:500;color:var(--muted)}
+.tx .d{border:0;background:var(--chip);color:var(--muted);border-radius:12px;padding:8px 10px;font-size:13px}
+.tx .d.sure{background:var(--exp);color:#fff}
+.tr{color:#c4b5fd}
+.empty{text-align:center;color:var(--muted);padding:34px 10px}
+.warn{background:rgba(251,191,36,.12);color:#fbbf24;border-radius:18px;padding:12px 15px;font-size:13px;margin-bottom:12px;line-height:1.4}
+.sec{display:flex;justify-content:space-between;align-items:center;margin:24px 4px 10px;font-weight:800;font-size:19px}
+.upd{font-size:12px;color:var(--muted);font-weight:500;display:flex;align-items:center;gap:8px}
+.mini{border:0;background:var(--chip);color:var(--text);width:32px;height:32px;border-radius:50%;font-size:16px}
+.mkh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.mv{font-size:30px;font-weight:800;letter-spacing:-.02em;margin-top:2px}
+.k2{font-size:14px;color:var(--muted);margin-top:2px}
+.chg{font-size:13px;font-weight:800;text-align:right;white-space:nowrap}
+.chg span{color:var(--muted);font-weight:500}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.g3 .card{padding:14px 12px;margin:0}
+.fv{font-size:17px;font-weight:800;margin:4px 0 8px;letter-spacing:-.02em}
+.fc{font-size:11px;font-weight:800;margin-top:6px}
+.acc{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;border:0;text-align:left;color:var(--text)}
+.acc b{font-size:17px}
+.acc .av{font-size:19px;font-weight:800;letter-spacing:-.02em}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.note{font-size:12px;color:var(--muted);text-align:center;margin-top:10px}
+svg{max-width:100%}
+/* calculator */
+.calc{display:flex;flex-direction:column;justify-content:flex-end;min-height:calc(100vh - 230px)}
+.cdisp{text-align:right;font-size:80px;font-weight:300;padding:6px 8px 20px;line-height:1.05;overflow:hidden;white-space:nowrap;letter-spacing:-.02em}
+.ckeys{--ck:calc((min(100vw,520px) - 64px) / 4);display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ck{border:0;height:var(--ck);border-radius:calc(var(--ck) / 2);font-size:32px;font-weight:400;background:#2a2242;color:var(--text);padding:0}
+.ck:active{filter:brightness(1.35)}
+.ck.fn{background:#b6aed6;color:#0b0716;font-size:28px}
+.ck.op{background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff;font-size:38px}
+.ck.op.on{background:#fff;color:var(--pri2)}
+.ck.zero{grid-column:span 2;text-align:left;padding-left:32px}
+/* nav */
+.nav{position:fixed;left:50%;transform:translateX(-50%);width:calc(100% - 24px);max-width:496px;bottom:calc(10px + env(safe-area-inset-bottom,0px));
+  display:flex;justify-content:space-between;align-items:center;padding:7px;border-radius:30px;
+  background:rgba(26,19,46,.8);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);box-shadow:0 14px 40px -12px rgba(0,0,0,.8);z-index:5}
+.nav button{border:0;background:transparent;color:var(--muted);display:flex;align-items:center;gap:7px;padding:11px 13px;border-radius:22px;font-size:13px;font-weight:700}
+.nav button svg{width:22px;height:22px;flex:none;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.nav button.on{background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom,0px));background:#f5f2ff;color:#14101f;padding:11px 18px;border-radius:999px;font-weight:700;font-size:15px;z-index:9;max-width:90%;text-align:center}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<nav class="nav" id="nav"></nav>
+<div id="toast" class="toast" style="display:none"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- constants ---------- */
+var EXP=["Еда","Транспорт","Продукты","Инвестиции","Подушка","Жильё","Здоровье","Связь","Развлечения","Одежда","Подписки","Другое"];
+var INC=["Зп","Дивиденды","Подарок","Подработка","Возврат","Другое"];
+var SAVINGS=["Инвестиции","Подушка"];
+var COLORS=["#8b5cf6","#ec4899","#22d3ee","#f59e0b","#34d399","#a78bfa","#fb7185","#60a5fa","#f472b6","#c084fc","#2dd4bf","#fbbf24"];
+var MON=["январь","февраль","март","апрель","май","июнь","июль","август","сентябрь","октябрь","ноябрь","декабрь"];
+var MONS=["янв","фев","мар","апр","май","июн","июл","авг","сен","окт","ноя","дек"];
+var CURS=[["RUB","₽","Российский рубль"],["USD","$","Доллар США"],["EUR","€","Евро"],["CNY","¥","Китайский юань"],["KZT","₸","Казахстанский тенге"],["UAH","₴","Украинская гривна"],["BYN","Br","Белорусский рубль"],["GBP","£","Фунт стерлингов"],["TRY","₺","Турецкая лира"],["AED","AED","Дирхам ОАЭ"],["GEL","₾","Грузинский лари"],["AMD","֏","Армянский драм"],["UZS","UZS","Узбекский сум"],["KGS","KGS","Киргизский сом"],["PLN","zł","Польский злотый"],["CHF","CHF","Швейцарский франк"],["JPY","JP¥","Японская иена"]];
+var SYM={},NEEDED={usd:1};
+CURS.forEach(function(c){SYM[c[0]]=c[1];NEEDED[c[0].toLowerCase()]=1});
+var FX3=[["usd","Доллар","$"],["eur","Евро","€"],["cny","Юань","¥"]];
+var CG="https://api.coingecko.com/api/v3";
+var LATEST_URLS=["https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json","https://latest.currency-api.pages.dev/v1/currencies/usd.json","https://open.er-api.com/v6/latest/USD"];
+var ICONS={
+  home:'<svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>',
+  stats:'<svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></svg>',
+  hist:'<svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg>',
+  acc:'<svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h13v3"/><path d="M3 7v11a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1H5a2 2 0 0 1-2-2z"/><path d="M16.5 14.5h.01"/></svg>',
+  calc:'<svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M8.5 7.5h7M9 12h.01M12 12h.01M15 12h.01M9 16h.01M12 16h.01M15 16h.01"/></svg>',
+  set:'<svg viewBox="0 0 24 24"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg>'
+};
+var TABS=[["home","Главная"],["stats","Обзор"],["hist","История"],["acc","Счета"],["calc","Калькулятор"],["set","Настройки"]];
+
+/* ---------- state ---------- */
+var data={v:2,txs:[],accounts:[],settings:{cur:"RUB",lastAcc:"main"}};
+var tab="home",wiz=newWiz(),view={off:0,kind:"exp"},ui={form:null,imp:null,armed:null};
+var form={name:"",start:"",from:"",to:"",amt:""};
+var RATES=null,M={btc:null,fx:null,t:0,fail:false,loading:false,histT:0,btcHistT:0};
+var missing=false,toastT=null;
+var calc={d:"0",acc:null,op:null,wait:false,lastOp:null,lastB:null};
+
+/* ---------- helpers ---------- */
+function lsGet(k){try{return localStorage.getItem("ft_"+k)}catch(e){return null}}
+function lsSet(k,v){try{localStorage.setItem("ft_"+k,v);return true}catch(e){return false}}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function pad(n){return n<10?"0"+n:""+n}
+function uid(){return "t"+Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function todayStr(){var d=new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
+function isoDay(ms){return new Date(ms).toISOString().slice(0,10)}
+function hm(ms){var d=new Date(ms);return pad(d.getHours())+":"+pad(d.getMinutes())}
+function parseAmt(s){s=String(s||"").replace(/\s/g,"").replace(",",".");var n=parseFloat(s);return(n>0&&n<1e13&&isFinite(n))?n:NaN}
+function parseNum(s){s=String(s||"").replace(/\s/g,"").replace(",",".");if(s===""||s==="-")return 0;var n=parseFloat(s);return isFinite(n)?n:NaN}
+function fmtN(n,d){return new Intl.NumberFormat("ru-RU",{minimumFractionDigits:d,maximumFractionDigits:d}).format(n)}
+function D(){return data.settings.cur}
+function moneyC(n,c){var r=Math.round(n*100)/100;var s=new Intl.NumberFormat("ru-RU",{maximumFractionDigits:2}).format(Math.abs(r));return(r<0?"−":"")+s+" "+(SYM[c]||c)}
+function money(n){return moneyC(n,D())}
+function shortNum(n){var a=Math.abs(n);if(a>=1e9)return(Math.round(n/1e8)/10)+" млрд";if(a>=1e6)return(Math.round(n/1e5)/10)+" млн";if(a>=1e4)return(Math.round(n/100)/10)+" тыс";return new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0}).format(n)}
+function toast(t){var el=document.getElementById("toast");el.textContent=t;el.style.display="block";clearTimeout(toastT);toastT=setTimeout(function(){el.style.display="none"},2000)}
+function newWiz(){return{step:0,type:null,amount:"",cur:null,acc:null,cat:"",custom:"",note:"",date:todayStr()}}
+
+/* ---------- data ---------- */
+function save(){var ok=lsSet("data2",JSON.stringify(data));if(!ok)toast("Не удалось сохранить данные")}
+function normalize(){
+  if(!data.settings)data.settings={};
+  if(!SYM[data.settings.cur])data.settings.cur="RUB";
+  if(!Array.isArray(data.accounts)||!data.accounts.length)data.accounts=[{id:"main",name:"Основной",start:0,cur:data.settings.cur}];
+  var ids={};data.accounts.forEach(function(a){ids[a.id]=1;if(!a.cur||!SYM[a.cur])a.cur=data.settings.cur;a.start=+a.start||0});
+  if(!ids[data.settings.lastAcc])data.settings.lastAcc=data.accounts[0].id;
+  data.txs=(data.txs||[]).filter(function(t){return t&&(t.type==="inc"||t.type==="exp"||t.type==="tr")&&t.amount>0&&t.ts});
+  data.txs.forEach(function(t){
+    if(!t.id)t.id=uid();
+    if(!t.cur||!SYM[t.cur])t.cur=data.settings.cur;
+    if(!ids[t.acc])t.acc=data.accounts[0].id;
+    if(t.type==="tr"&&!ids[t.to])t.to=data.accounts[0].id;
+  });
+}
+function loadData(){
+  var ok=false,raw=lsGet("data2");
+  if(raw){try{var d=JSON.parse(raw);if(d&&d.v===2){data=d;ok=true}}catch(e){}}
+  if(!ok){
+    var legacy=[];try{legacy=JSON.parse(lsGet("txs")||"[]")}catch(e){}
+    var code=({"₽":"RUB","₸":"KZT","₴":"UAH","$":"USD","€":"EUR","Br":"BYN"})[lsGet("cur")||"₽"]||"RUB";
+    data={v:2,txs:[],accounts:[{id:"main",name:"Основной",start:0,cur:code}],settings:{cur:code,lastAcc:"main"}};
+    legacy.forEach(function(t){
+      if(t&&(t.type==="inc"||t.type==="exp")&&t.amount>0&&t.ts)data.txs.push({id:t.id,type:t.type,amount:t.amount,cur:code,acc:"main",cat:t.cat||"Другое",note:t.note||"",ts:t.ts});
+    });
+  }
+  normalize();
+  if(!ok)save();
+}
+
+/* ---------- rates ---------- */
+function loadCaches(){
+  try{var j=JSON.parse(lsGet("rates")||"null");if(j&&j.r&&j.r.rub)RATES=j}catch(e){}
+  try{var m=JSON.parse(lsGet("market")||"null");if(m){M.btc=m.btc||null;M.fx=m.fx||null;M.t=m.t||0;M.histT=m.histT||0;M.btcHistT=m.btcHistT||0}}catch(e){}
+}
+function saveMarket(){lsSet("market",JSON.stringify({btc:M.btc,fx:M.fx,t:M.t,histT:M.histT,btcHistT:M.btcHistT}))}
+function conv(a,from,to){
+  if(!from||from===to)return a;
+  if(!RATES){missing=true;return a}
+  var rf=RATES.r[from.toLowerCase()],rt=RATES.r[to.toLowerCase()];
+  if(!rf||!rt){missing=true;return a}
+  return a*rt/rf;
+}
+function fetchJSON(url,ms){
+  return new Promise(function(res,rej){
+    var ctl=(typeof AbortController!=="undefined")?new AbortController():null;
+    var to=setTimeout(function(){if(ctl)ctl.abort();rej(new Error("timeout"))},ms||9000);
+    fetch(url,{cache:"no-store",signal:ctl?ctl.signal:undefined}).then(function(r){if(!r.ok)throw new Error("http");return r.json()})
+      .then(function(j){clearTimeout(to);res(j)}).catch(function(e){clearTimeout(to);rej(e)});
+  });
+}
+function firstOk(urls,pick){
+  var i=0;
+  function next(){
+    if(i>=urls.length)return Promise.reject(new Error("all failed"));
+    var u=urls[i++];
+    return fetchJSON(u).then(function(j){var v=pick(j);if(!v)throw new Error("bad");return v}).catch(next);
+  }
+  return next();
+}
+function pickRates(j){
+  var src=j&&(j.usd||j.rates);if(!src||typeof src!=="object")return null;
+  var r={};Object.keys(src).forEach(function(k){var kk=k.toLowerCase();if(NEEDED[kk]&&+src[k]>0)r[kk]=+src[k]});
+  r.usd=1;return r.rub?r:null;
+}
+function dayUrls(d){return["https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@"+d+"/v1/currencies/usd.json","https://"+d+".currency-api.pages.dev/v1/currencies/usd.json"]}
+function down(a,n){if(a.length<=n)return a;var st=a.length/n,o=[],i;for(i=0;i<n;i++)o.push(a[Math.floor(i*st)]);o.push(a[a.length-1]);return o}
+function loadFxHist(latest){
+  var days=[],i;for(i=6;i>=1;i--)days.push(isoDay(Date.now()-i*864e5));
+  return Promise.all(days.map(function(d){return firstOk(dayUrls(d),pickRates).catch(function(){return null})})).then(function(arr){
+    FX3.forEach(function(f){
+      var c=f[0],s=[];
+      arr.forEach(function(r){if(r&&r[c]&&r.rub)s.push(r.rub/r[c])});
+      s.push(latest.rub/latest[c]);
+      if(!M.fx[c])M.fx[c]={};
+      M.fx[c].spark=s;
+    });
+    M.histT=Date.now();
+  });
+}
+function refreshFx(force){
+  return firstOk(LATEST_URLS,pickRates).then(function(r){
+    RATES={t:Date.now(),r:r};lsSet("rates",JSON.stringify(RATES));
+    if(!M.fx)M.fx={};
+    FX3.forEach(function(f){var c=f[0];if(r[c]){if(!M.fx[c])M.fx[c]={};M.fx[c].v=r.rub/r[c]}});
+    if(force||!M.histT||Date.now()-M.histT>6*3600e3)return loadFxHist(r);
+  });
+}
+function refreshBtc(force){
+  return fetchJSON(CG+"/simple/price?ids=bitcoin&vs_currencies=usd,rub").then(function(j){
+    var b=j&&j.bitcoin;if(!b||!b.usd)throw new Error("bad");return{usd:b.usd,rub:b.rub||null};
+  }).catch(function(){
+    return fetchJSON("https://api.coinbase.com/v2/prices/BTC-USD/spot").then(function(j){return{usd:parseFloat(j.data.amount),rub:null}});
+  }).then(function(p){
+    var old=M.btc||{};M.btc={usd:p.usd,rub:p.rub,spark:old.spark||null};
+    if(force||!old.spark||Date.now()-(M.btcHistT||0)>3600e3){
+      return fetchJSON(CG+"/coins/bitcoin/market_chart?vs_currency=usd&days=7").then(function(j){
+        var pr=(j.prices||[]).map(function(x){return x[1]});
+        if(pr.length>2){M.btc.spark=down(pr,56);M.btcHistT=Date.now()}
+      }).catch(function(){});
+    }
+  });
+}
+function refreshAll(force){
+  if(M.loading)return Promise.resolve();
+  M.loading=true;
+  var fails=0;
+  return Promise.all([refreshFx(force).catch(function(){fails++}),refreshBtc(force).catch(function(){fails++})]).then(function(){
+    M.loading=false;M.fail=fails>0;if(fails<2)M.t=Date.now();
+    saveMarket();softRender();
+  });
+}
+function btcRub(){var b=M.btc;if(!b)return null;if(b.rub)return b.rub;if(RATES&&RATES.r.rub)return b.usd*RATES.r.rub;return null}
+
+/* ---------- accounts / sums ---------- */
+function V(t){return conv(t.amount,t.cur,D())}
+function accName(id){for(var i=0;i<data.accounts.length;i++)if(data.accounts[i].id===id)return data.accounts[i].name;return"?"}
+function accBal(a){
+  var s=conv(a.start||0,a.cur||D(),D());
+  data.txs.forEach(function(t){
+    var v=V(t);
+    if(t.type==="inc"&&t.acc===a.id)s+=v;
+    else if(t.type==="exp"&&t.acc===a.id)s-=v;
+    else if(t.type==="tr"){if(t.acc===a.id)s-=v;if(t.to===a.id)s+=v}
+  });
+  return s;
+}
+function totalBalance(){return data.accounts.reduce(function(x,a){return x+accBal(a)},0)}
+function monthKeyOf(ts){var d=new Date(ts);return d.getFullYear()*12+d.getMonth()}
+function curKey(){var n=new Date();return n.getFullYear()*12+n.getMonth()+view.off}
+function inMonth(k){return data.txs.filter(function(t){return t.type!=="tr"&&monthKeyOf(t.ts)===k})}
+function sumBy(list,type){return list.filter(function(t){return t.type===type}).reduce(function(a,t){return a+V(t)},0)}
+function customCats(type){
+  var base=type==="inc"?INC:EXP,seen={},out=[];
+  data.txs.slice().sort(function(a,b){return b.ts-a.ts}).forEach(function(t){
+    if(t.type===type&&base.indexOf(t.cat)<0&&!seen[t.cat]){seen[t.cat]=1;out.push(t.cat)}
+  });
+  return out.slice(0,8);
+}
+
+/* ---------- charts ---------- */
+function spark(a,w,h,col,id){
+  if(!a||a.length<2)return'<div style="height:'+h+'px"></div>';
+  var mn=Math.min.apply(null,a),mx=Math.max.apply(null,a),rg=(mx-mn)||1,p=3;
+  var pts=a.map(function(v,i){return[(i/(a.length-1))*w,p+(1-(v-mn)/rg)*(h-2*p)]});
+  var line=pts.map(function(q,i){return(i?"L":"M")+q[0].toFixed(1)+" "+q[1].toFixed(1)}).join(" ");
+  var area=line+" L"+w+" "+h+" L0 "+h+" Z";
+  return'<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="'+h+'" preserveAspectRatio="none" style="display:block"><defs><linearGradient id="'+id+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+col+'" stop-opacity=".38"/><stop offset="1" stop-color="'+col+'" stop-opacity="0"/></linearGradient></defs><path d="'+area+'" fill="url(#'+id+')"/><path d="'+line+'" fill="none" stroke="'+col+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>';
+}
+function chgPct(a){if(!a||a.length<2||!a[0])return null;return(a[a.length-1]-a[0])/a[0]*100}
+function chgHTML(a){var p=chgPct(a);if(p===null)return"";return'<div class="chg '+(p>=0?"pos":"neg")+'">'+(p>=0?"▲ ":"▼ ")+fmtN(Math.abs(p),2)+'% <span>7д</span></div>'}
+function trendCol(a){var p=chgPct(a);return(p===null||p>=0)?"#34d399":"#fb7185"}
+
+function donut(items,total){
+  var R=60,C=2*Math.PI*R,off=0,s='<svg viewBox="0 0 160 160" width="180" height="180" style="display:block;margin:0 auto">';
+  s+='<circle cx="80" cy="80" r="'+R+'" fill="none" stroke="#221b38" stroke-width="20"/>';
+  items.forEach(function(it,i){
+    var len=C*it.v/total;
+    s+='<circle cx="80" cy="80" r="'+R+'" fill="none" stroke="'+COLORS[i%COLORS.length]+'" stroke-width="20" stroke-dasharray="'+len+' '+(C-len)+'" stroke-dashoffset="'+(-off)+'" transform="rotate(-90 80 80)"/>';
+    off+=len;
+  });
+  s+='<text x="80" y="76" text-anchor="middle" fill="#8d86a8" font-size="11">всего</text>';
+  s+='<text x="80" y="96" text-anchor="middle" fill="#f5f2ff" font-size="16" font-weight="800">'+esc(shortNum(total))+'</text></svg>';
+  return s;
+}
+function bars6(){
+  var k=curKey(),arr=[],i,max=1;
+  for(i=5;i>=0;i--){var kk=k-i,l=inMonth(kk),inc=sumBy(l,"inc"),ex=sumBy(l,"exp");arr.push({m:MONS[((kk%12)+12)%12],inc:inc,exp:ex});max=Math.max(max,inc,ex)}
+  var W=320,H=140,bw=16,gap=(W-6*(bw*2+4))/7,x=gap,s='<svg viewBox="0 0 '+W+' '+(H+22)+'" width="100%">';
+  arr.forEach(function(d){
+    var hi=d.inc/max*(H-8),he=d.exp/max*(H-8);
+    s+='<rect x="'+x+'" y="'+(H-hi)+'" width="'+bw+'" height="'+hi+'" rx="5" fill="#34d399"/>';
+    s+='<rect x="'+(x+bw+4)+'" y="'+(H-he)+'" width="'+bw+'" height="'+he+'" rx="5" fill="#fb7185"/>';
+    s+='<text x="'+(x+bw+2)+'" y="'+(H+16)+'" text-anchor="middle" font-size="11" fill="#8d86a8">'+d.m+'</text>';
+    x+=bw*2+4+gap;
+  });
+  return s+'</svg>';
+}
+function dailyBars(list){
+  var k=curKey(),y=Math.floor(k/12),m=((k%12)+12)%12,days=new Date(y,m+1,0).getDate(),arr=[],i,max=1;
+  for(i=0;i<days;i++)arr.push(0);
+  list.filter(function(t){return t.type==="exp"}).forEach(function(t){arr[new Date(t.ts).getDate()-1]+=V(t)});
+  arr.forEach(function(v){if(v>max)max=v});
+  var W=320,H=90,bw=(W/days)-2,s='<svg viewBox="0 0 '+W+' '+(H+18)+'" width="100%">';
+  arr.forEach(function(v,idx){var h=v/max*(H-6);s+='<rect x="'+(idx*(W/days)+1)+'" y="'+(H-h)+'" width="'+bw+'" height="'+Math.max(h,v?2:0)+'" rx="2" fill="#8b5cf6"/>'});
+  [1,Math.ceil(days/2),days].forEach(function(d){s+='<text x="'+((d-1)*(W/days)+bw/2)+'" y="'+(H+14)+'" text-anchor="middle" font-size="10" fill="#8d86a8">'+d+'</text>'});
+  return s+'</svg>';
+}
+
+/* ---------- views ---------- */
+function marketHTML(){
+  var h='<div class="sec"><span>Рынок</span><span class="upd">'+(M.t?'обновлено '+hm(M.t):'')+(M.fail?' · нет связи':'')+' <button class="mini" data-act="refresh" aria-label="Обновить">↻</button></span></div>';
+  var b=M.btc,r=btcRub();
+  h+='<div class="card"><div class="mkh"><div><div class="k">Bitcoin</div>'
+    +(b?'<div class="mv">$'+fmtN(b.usd,0)+'</div><div class="k2">'+(r?fmtN(r,0)+' ₽':'')+'</div>':'<div class="mv">—</div>')
+    +'</div>'+chgHTML(b&&b.spark)+'</div>'+(b?spark(b.spark,300,70,trendCol(b.spark),"gb"):'')+'</div>';
+  h+='<div class="g3">';
+  FX3.forEach(function(f){
+    var x=M.fx&&M.fx[f[0]];
+    h+='<div class="card"><div class="k">'+f[2]+' '+f[1]+'</div><div class="fv">'+(x&&x.v?fmtN(x.v,2)+' ₽':'—')+'</div>'
+      +(x?spark(x.spark,100,36,trendCol(x.spark),"g"+f[0]):'')
+      +(x&&x.spark?'<div class="fc '+((chgPct(x.spark)||0)>=0?"pos":"neg")+'">'+((chgPct(x.spark)||0)>=0?"▲ ":"▼ ")+fmtN(Math.abs(chgPct(x.spark)||0),2)+'%</div>':'')+'</div>';
+  });
+  h+='</div>';
+  if(!M.btc&&!M.fx)h+='<div class="note">'+(M.loading?'Загружаю курсы…':'Нет связи с рынком. Нажми ↻, когда появится интернет.')+'</div>';
+  else h+='<div class="note">Биткойн обновляется каждую минуту. Курсы валют — рыночные, обновляются раз в сутки.</div>';
+  return h;
+}
+
+function viewHome(){
+  var h='';
+  if(wiz.step===0){
+    h+='<div class="hero"><div class="k">Общий баланс</div><div class="hv">'+esc(money(totalBalance()))+'</div>';
+    if(data.accounts.length>1){
+      h+='<div class="accs">'+data.accounts.map(function(a){return'<div class="ap"><span>'+esc(a.name)+'</span><b>'+esc(money(accBal(a)))+'</b></div>'}).join("")+'</div>';
+    }
+    h+='</div>';
+    h+='<div class="big2"><button class="bigbtn b-inc" data-act="type" data-v="inc"><small>＋</small>Доход</button>'
+      +'<button class="bigbtn b-exp" data-act="type" data-v="exp"><small>−</small>Расход</button></div>';
+    h+=marketHTML();
+  }else if(wiz.step===1){
+    h+='<div class="card"><div class="crumb"><b>'+(wiz.type==="inc"?"Доход":"Расход")+'</b> · сумма</div>'
+      +'<input id="amt" class="amount" inputmode="decimal" placeholder="0" value="'+esc(wiz.amount)+'" autocomplete="off">'
+      +'<div class="lbl">Валюта</div><select id="wcur" class="sel">'
+      +CURS.map(function(c){return'<option value="'+c[0]+'"'+(c[0]===wiz.cur?" selected":"")+'>'+c[0]+' · '+esc(c[2])+'</option>'}).join("")
+      +'</select>'
+      +'<button class="btn" data-act="toCat">Далее</button>'
+      +'<button class="btn ghost" data-act="back0">Назад</button></div>';
+  }else{
+    var base=wiz.type==="inc"?INC:EXP,extra=customCats(wiz.type);
+    h+='<div class="card"><div class="crumb"><b>'+(wiz.type==="inc"?"Доход":"Расход")+'</b> · '+esc(moneyC(parseAmt(wiz.amount),wiz.cur))+' · '+(wiz.type==="inc"?"откуда":"куда")+'</div><div class="chips">';
+    base.concat(extra).forEach(function(c){h+='<button class="chip'+((!wiz.custom&&wiz.cat===c)?" on":"")+'" data-act="cat" data-v="'+esc(c)+'">'+esc(c)+'</button>'});
+    h+='</div><div class="lbl">Или впиши свою категорию</div><input id="cust" class="txt" placeholder="Например: Кофе" value="'+esc(wiz.custom)+'">';
+    if(data.accounts.length>1){
+      h+='<div class="lbl">Счёт</div><div class="chips">'+data.accounts.map(function(a){return'<button class="chip'+(wiz.acc===a.id?" on":"")+'" data-act="wacc" data-v="'+esc(a.id)+'">'+esc(a.name)+'</button>'}).join("")+'</div>';
+    }
+    h+='<div class="row2"><div><div class="lbl">Заметка</div><input id="nt" class="txt" placeholder="необязательно" value="'+esc(wiz.note)+'"></div>'
+      +'<div><div class="lbl">Дата</div><input id="dt" class="txt" type="date" value="'+esc(wiz.date)+'"></div></div>'
+      +'<button class="btn" data-act="save">Сохранить</button><button class="btn ghost" data-act="back1">Назад</button></div>';
+  }
+  return h;
+}
+
+function monthHead(){
+  var k=curKey(),y=Math.floor(k/12),m=((k%12)+12)%12;
+  return'<div class="month"><button data-act="prev">‹</button><b>'+MON[m]+' '+y+'</b><button data-act="next"'+(view.off>=0?' disabled style="opacity:.3"':'')+'>›</button></div>';
+}
+function viewStats(){
+  var list=inMonth(curKey()),inc=sumBy(list,"inc"),exp=sumBy(list,"exp"),bal=inc-exp;
+  var saved=list.filter(function(t){return t.type==="exp"&&SAVINGS.indexOf(t.cat)>=0}).reduce(function(a,t){return a+V(t)},0);
+  var h='<div class="top"><h1>Обзор</h1></div>'+monthHead();
+  h+='<div class="card"><div class="sum">'
+    +'<div><div class="k">Доходы</div><div class="v pos">'+esc(money(inc))+'</div></div>'
+    +'<div><div class="k">Расходы</div><div class="v neg">'+esc(money(exp))+'</div></div>'
+    +'<div><div class="k">Баланс месяца</div><div class="v '+(bal>=0?"pos":"neg")+'">'+esc(money(bal))+'</div></div>'
+    +'<div><div class="k">Отложено</div><div class="v">'+esc(money(saved))+'</div></div></div>';
+  if(inc>0)h+='<div class="hint" style="margin-top:12px">Откладываешь '+Math.round(saved/inc*100)+'% от дохода (инвестиции + подушка)</div>';
+  h+='</div>';
+  h+='<div class="seg"><button data-act="kind" data-v="exp" class="'+(view.kind==="exp"?"on":"")+'">Расходы</button><button data-act="kind" data-v="inc" class="'+(view.kind==="inc"?"on":"")+'">Доходы</button></div>';
+  var byCat={};
+  list.filter(function(t){return t.type===view.kind}).forEach(function(t){byCat[t.cat]=(byCat[t.cat]||0)+V(t)});
+  var items=Object.keys(byCat).map(function(c){return{c:c,v:byCat[c]}}).sort(function(a,b){return b.v-a.v});
+  var total=items.reduce(function(a,i){return a+i.v},0);
+  h+='<div class="card">';
+  if(!items.length)h+='<div class="empty">Нет данных за этот месяц</div>';
+  else{
+    h+=donut(items,total)+'<div class="legend">';
+    items.forEach(function(it,i){h+='<div class="lg"><i style="background:'+COLORS[i%COLORS.length]+'"></i><span class="n">'+esc(it.c)+'</span><span class="p">'+Math.round(it.v/total*100)+'%</span><span class="a">'+esc(money(it.v))+'</span></div>'});
+    h+='</div>';
+  }
+  h+='</div>';
+  var k=curKey(),days=new Date(Math.floor(k/12),((k%12)+12)%12+1,0).getDate(),div=view.off===0?new Date().getDate():days;
+  h+='<div class="card"><div class="hint" style="margin-bottom:8px">Расходы по дням · в среднем '+esc(money(exp/Math.max(div,1)))+' в день</div>'+dailyBars(list)+'</div>';
+  h+='<div class="card"><div class="hint" style="margin-bottom:8px">Последние 6 месяцев: <span class="pos">доходы</span> / <span class="neg">расходы</span></div>'+bars6()+'</div>';
+  return h;
+}
+
+function viewHist(){
+  var list=data.txs.slice().sort(function(a,b){return b.ts-a.ts}),h='<div class="top"><h1>История</h1></div>';
+  if(!list.length)return h+'<div class="empty">Пока нет записей</div>';
+  var last="",multi=data.accounts.length>1;
+  list.slice(0,300).forEach(function(t){
+    var d=new Date(t.ts),ds=pad(d.getDate())+"."+pad(d.getMonth()+1)+"."+d.getFullYear();
+    if(ds!==last){h+='<div class="day">'+ds+'</div>';last=ds}
+    var sub=t.type==="tr"?accName(t.acc)+" → "+accName(t.to):(multi?accName(t.acc):"");
+    if(t.note)sub=(sub?sub+" · ":"")+t.note;
+    var main=t.type==="tr"?"Перевод":t.cat;
+    var cls=t.type==="inc"?"pos":t.type==="exp"?"neg":"tr",sign=t.type==="inc"?"+":t.type==="exp"?"−":"";
+    h+='<div class="tx"><div class="m"><div class="c">'+esc(main)+'</div>'+(sub?'<div class="nt">'+esc(sub)+'</div>':'')+'</div>'
+      +'<div class="s '+cls+'">'+sign+esc(money(V(t)))+(t.cur!==D()?'<small>'+esc(moneyC(t.amount,t.cur))+'</small>':'')+'</div>'
+      +'<button class="d'+(ui.armed===t.id?" sure":"")+'" data-act="del" data-v="'+esc(t.id)+'">'+(ui.armed===t.id?"Точно?":"✕")+'</button></div>';
+  });
+  if(list.length>300)h+='<div class="note">Показаны последние 300 записей</div>';
+  return h;
+}
+
+function viewAcc(){
+  var h='<div class="top"><h1>Счета</h1></div>';
+  h+='<div class="hero"><div class="k">Всего на счетах</div><div class="hv">'+esc(money(totalBalance()))+'</div></div>';
+  h+='<div class="two"><button class="btn" style="margin-top:0" data-act="accNew">+ Счёт</button><button class="btn ghost" style="margin-top:0" data-act="trForm">Перевод</button></div>';
+  var f=ui.form;
+  if(f==="new"||(f&&f.indexOf("edit:")===0)){
+    var isEdit=f!=="new",ac=null;
+    if(isEdit){var id=f.slice(5);data.accounts.forEach(function(a){if(a.id===id)ac=a})}
+    h+='<div class="card" style="margin-top:12px"><div class="crumb"><b>'+(isEdit?"Изменить счёт":"Новый счёт")+'</b></div>'
+      +'<div class="lbl">Название</div><input id="fname" class="txt" placeholder="Например: Копилка, Карта Тинькофф" value="'+esc(form.name)+'">'
+      +'<div class="lbl">Начальный остаток ('+esc(ac?ac.cur:D())+')</div><input id="fstart" class="txt" inputmode="decimal" placeholder="0" value="'+esc(form.start)+'">'
+      +'<button class="btn" data-act="accSave">Сохранить</button>'
+      +(isEdit?'<button class="btn danger" data-act="accDel">'+(ui.armed==="del"?"Точно удалить?":"Удалить счёт")+'</button>':'')
+      +'<button class="btn ghost" data-act="accCancel">Отмена</button></div>';
+  }else if(f==="tr"){
+    var opts=function(sel){return data.accounts.map(function(a){return'<option value="'+esc(a.id)+'"'+(a.id===sel?" selected":"")+'>'+esc(a.name)+'</option>'}).join("")};
+    h+='<div class="card" style="margin-top:12px"><div class="crumb"><b>Перевод между счетами</b></div>'
+      +'<div class="lbl">Откуда</div><select id="trfrom" class="sel">'+opts(form.from)+'</select>'
+      +'<div class="lbl">Куда</div><select id="trto" class="sel">'+opts(form.to)+'</select>'
+      +'<div class="lbl">Сумма ('+esc(D())+')</div><input id="tramt" class="txt" inputmode="decimal" placeholder="0" value="'+esc(form.amt)+'">'
+      +'<button class="btn" data-act="trSave">Перевести</button><button class="btn ghost" data-act="accCancel">Отмена</button></div>';
+  }
+  h+='<div style="margin-top:12px">';
+  data.accounts.forEach(function(a){
+    var b=accBal(a);
+    h+='<div class="card" style="padding:0"><button class="acc" style="padding:18px" data-act="accEdit" data-v="'+esc(a.id)+'"><b>'+esc(a.name)+'</b><span class="av '+(b<0?"neg":"")+'">'+esc(money(b))+'</span></button></div>';
+  });
+  h+='</div><div class="note">Нажми на счёт, чтобы переименовать или поменять начальный остаток</div>';
+  return h;
+}
+
+function prettyNum(s){
+  if(s==="Ошибка")return s;
+  var neg=s.charAt(0)==="-";if(neg)s=s.slice(1);
+  var p=s.split("."),i=p[0].replace(/\B(?=(\d{3})+(?!\d))/g," ");
+  return(neg?"−":"")+i+(p.length>1?","+p[1]:"");
+}
+function calcLabelAC(){return(calc.d!=="0"&&!calc.wait)?"C":"AC"}
+function viewCalc(){
+  var k=function(label,v,cls){return'<button class="ck '+(cls||"")+(calc.op===v&&calc.wait&&cls==="op"?" on":"")+'" data-act="ck" data-v="'+v+'">'+label+'</button>'};
+  return'<div class="calc"><div class="cdisp" id="cdisp">'+esc(prettyNum(calc.d))+'</div><div class="ckeys">'
+    +'<button class="ck fn" id="cac" data-act="ck" data-v="AC">'+calcLabelAC()+'</button>'+k("±","neg","fn")+k("%","pct","fn")+k("÷","/","op")
+    +k("7","7")+k("8","8")+k("9","9")+k("×","*","op")
+    +k("4","4")+k("5","5")+k("6","6")+k("−","-","op")
+    +k("1","1")+k("2","2")+k("3","3")+k("+","+","op")
+    +k("0","0","zero")+k(",",".")+k("=","=","op")
+    +'</div></div>';
+}
+function calcReset(){calc={d:"0",acc:null,op:null,wait:false,lastOp:null,lastB:null}}
+function cnum(){return parseFloat(calc.d)}
+function cfmt(n){if(!isFinite(n))return"Ошибка";return String(parseFloat(n.toPrecision(12)))}
+function cdo(a,o,b){return o==="+"?a+b:o==="-"?a-b:o==="*"?a*b:(b===0?NaN:a/b)}
+function cpress(k){
+  if(/^[0-9]$/.test(k)){
+    if(calc.d==="Ошибка")calcReset();
+    if(calc.wait){calc.d=k;calc.wait=false}
+    else if(calc.d==="0")calc.d=k;
+    else if(calc.d==="-0")calc.d="-"+k;
+    else if(calc.d.replace(/[-.]/g,"").length<9)calc.d+=k;
+  }else if(k==="."){
+    if(calc.d==="Ошибка")calcReset();
+    if(calc.wait){calc.d="0.";calc.wait=false}
+    else if(calc.d.indexOf(".")<0)calc.d+=".";
+  }else if(k==="AC"){
+    if(calcLabelAC()==="C")calc.d="0";else calcReset();
+  }else if(k==="neg"){
+    if(calc.d!=="Ошибка"){
+      if(calc.wait){calc.d="-0";calc.wait=false}
+      else calc.d=calc.d.charAt(0)==="-"?calc.d.slice(1):"-"+calc.d;
+    }
+  }else if(k==="pct"){
+    calc.d=cfmt(cnum()/100);
+  }else if(k==="+"||k==="-"||k==="*"||k==="/"){
+    if(calc.op&&!calc.wait){var r=cdo(calc.acc,calc.op,cnum());calc.acc=r;calc.d=cfmt(r)}
+    else calc.acc=cnum();
+    calc.op=k;calc.wait=true;calc.lastOp=null;
+  }else if(k==="="){
+    if(calc.op){var b=cnum(),r2=cdo(calc.acc,calc.op,b);calc.lastOp=calc.op;calc.lastB=b;calc.d=cfmt(r2);calc.acc=null;calc.op=null;calc.wait=true}
+    else if(calc.lastOp){calc.d=cfmt(cdo(cnum(),calc.lastOp,calc.lastB));calc.wait=true}
+  }
+}
+function updateCalcDOM(){
+  var el=document.getElementById("cdisp");if(!el)return;
+  var s=prettyNum(calc.d);el.textContent=s;
+  el.style.fontSize=(s.length>11?44:s.length>8?58:s.length>6?68:80)+"px";
+  var ac=document.getElementById("cac");if(ac)ac.textContent=calcLabelAC();
+  var btns=document.querySelectorAll(".ck.op");
+  for(var i=0;i<btns.length;i++){
+    var on=calc.op&&calc.wait&&btns[i].getAttribute("data-v")===calc.op;
+    if(on)btns[i].classList.add("on");else btns[i].classList.remove("on");
+  }
+}
+
+function viewSet(){
+  var h='<div class="top"><h1>Настройки</h1></div>';
+  h+='<div class="card"><div class="lbl" style="margin-top:0">Валюта приложения</div><select id="scur" class="sel">'
+    +CURS.map(function(c){return'<option value="'+c[0]+'"'+(c[0]===D()?" selected":"")+'>'+c[0]+' · '+esc(c[2])+'</option>'}).join("")
+    +'</select><div class="hint" style="margin-top:10px">Все суммы пересчитываются по текущему курсу. Записи, внесённые в другой валюте, сохраняют оригинальную сумму.'
+    +(RATES?' Курсы от '+new Date(RATES.t).toLocaleDateString("ru-RU")+' '+hm(RATES.t)+'.':' Курсы ещё не загружены.')+'</div>'
+    +'<button class="btn ghost" data-act="refresh">Обновить курсы</button></div>';
+  h+='<div class="card"><div class="lbl" style="margin-top:0">Данные</div>'
+    +'<button class="btn" data-act="expJson">Экспорт · резервная копия</button>'
+    +'<button class="btn ghost" data-act="expCsv">Экспорт · таблица CSV</button>'
+    +'<button class="btn ghost" data-act="impPick">Импорт из файла</button>'
+    +'<input type="file" id="file" accept=".json,.csv,.txt,application/json,text/csv,text/plain" style="display:none">'
+    +'<div class="hint" style="margin-top:12px">Резервная копия (JSON) сохраняет всё: записи и счета. Импорт понимает JSON из этого приложения и CSV (в том числе старой версии).</div></div>';
+  if(ui.imp){
+    h+='<div class="card"><div class="crumb"><b>Файл прочитан</b> · '+esc(ui.imp.kind)+', записей: '+ui.imp.txs.length+'</div>'
+      +'<button class="btn" data-act="impMerge">Добавить к текущим</button>'
+      +'<button class="btn danger" data-act="impReplace">'+(ui.armed==="rep"?"Точно заменить всё?":"Заменить все данные")+'</button>'
+      +'<button class="btn ghost" data-act="impCancel">Отмена</button></div>';
+  }
+  return h;
+}
+
+function render(){
+  missing=false;
+  var body=tab==="home"?viewHome():tab==="stats"?viewStats():tab==="hist"?viewHist():tab==="acc"?viewAcc():tab==="calc"?viewCalc():viewSet();
+  var banner=missing?'<div class="warn">Нет курсов валют, поэтому суммы в разных валютах пока не пересчитаны. Подключись к интернету и нажми ↻ на главной.</div>':'';
+  document.getElementById("app").innerHTML=banner+body;
+  document.getElementById("nav").innerHTML=TABS.map(function(t){
+    return'<button data-act="tab" data-v="'+t[0]+'" class="'+(tab===t[0]?"on":"")+'" aria-label="'+t[1]+'">'+ICONS[t[0]]+(tab===t[0]?'<span>'+t[1]+'</span>':'')+'</button>';
+  }).join("");
+  if(tab==="home"&&wiz.step===1){var a=document.getElementById("amt");if(a){try{a.focus()}catch(e){}}}
+  if(tab==="calc")updateCalcDOM();
+}
+function softRender(){
+  if(tab==="home"&&wiz.step===0)render();
+  else if(tab==="stats"||tab==="hist")render();
+  else if(tab==="acc"&&!ui.form)render();
+  else if(tab==="set"&&!ui.imp)render();
+}
+
+/* ---------- import / export ---------- */
+function cleanTx(t){
+  if(!t||(t.type!=="inc"&&t.type!=="exp"&&t.type!=="tr"))return null;
+  var amount=+t.amount,ts=+t.ts;if(!(amount>0)||!isFinite(amount)||!isFinite(ts))return null;
+  var c=t.cur&&NEEDED[String(t.cur).toLowerCase()]?String(t.cur).toUpperCase():D();
+  return{id:t.id?String(t.id):null,type:t.type,amount:amount,cur:c,acc:t.acc||null,to:t.to||null,accName:t.accName||null,toName:t.toName||null,cat:String(t.cat||"Другое").slice(0,40),note:String(t.note||"").slice(0,120),ts:ts};
+}
+function parseCSV(text){
+  text=text.replace(/^\ufeff/,"");
+  var first=text.split("\n")[0],delim=first.indexOf(";")>=0?";":",";
+  var rows=[],row=[],f="",q=false,i,c;
+  for(i=0;i<text.length;i++){
+    c=text.charAt(i);
+    if(q){if(c==='"'){if(text.charAt(i+1)==='"'){f+='"';i++}else q=false}else f+=c}
+    else if(c==='"')q=true;
+    else if(c===delim){row.push(f);f=""}
+    else if(c==="\n"||c==="\r"){if(c==="\r"&&text.charAt(i+1)==="\n")i++;row.push(f);f="";if(row.length>1||row[0]!=="")rows.push(row);row=[]}
+    else f+=c;
+  }
+  if(f!==""||row.length){row.push(f);if(row.length>1||row[0]!=="")rows.push(row)}
+  return rows;
+}
+function parseDate(s){
+  s=String(s||"").trim();var m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(m)return new Date(+m[1],+m[2]-1,+m[3],12).getTime();
+  m=s.match(/^(\d{2})\.(\d{2})\.(\d{4})/);
+  if(m)return new Date(+m[3],+m[2]-1,+m[1],12).getTime();
+  return NaN;
+}
+function parseImport(text){
+  var t=text.replace(/^\ufeff/,"").trim();
+  if(t.charAt(0)==="{"||t.charAt(0)==="["){
+    var j=JSON.parse(t),d=j.data||j,arr=Array.isArray(d)?d:d.txs;
+    if(!Array.isArray(arr))throw new Error("bad");
+    return{kind:"JSON",txs:arr.map(cleanTx).filter(Boolean),accounts:Array.isArray(d.accounts)?d.accounts.filter(function(a){return a&&a.id&&a.name}):null};
+  }
+  var rows=parseCSV(t);if(rows.length<2)throw new Error("bad");
+  var head=rows[0].map(function(x){return x.trim().toLowerCase()});
+  var ix=function(n){return head.indexOf(n)};
+  var iD=ix("дата"),iT=ix("тип"),iC=ix("категория"),iS=ix("сумма"),iV=ix("валюта"),iA=ix("счёт"),iA2=ix("счет"),iTo=ix("на счёт"),iN=ix("заметка");
+  if(iA<0)iA=iA2;
+  if(iD<0||iT<0||iS<0)throw new Error("bad");
+  var out=[];
+  rows.slice(1).forEach(function(r){
+    var ty=(r[iT]||"").trim().toLowerCase(),type=ty==="доход"?"inc":ty==="расход"?"exp":ty==="перевод"?"tr":null;
+    var x=cleanTx({type:type,amount:parseFloat(String(r[iS]||"").replace(/\s/g,"").replace(",",".")),ts:parseDate(r[iD]),cur:iV>=0?(r[iV]||"").trim():null,accName:iA>=0?(r[iA]||"").trim():null,toName:iTo>=0?(r[iTo]||"").trim():null,cat:iC>=0?r[iC]:"Другое",note:iN>=0?r[iN]:""});
+    if(x)out.push(x);
+  });
+  return{kind:"CSV",txs:out,accounts:null};
+}
+function applyImport(mode){
+  var imp=ui.imp;if(!imp)return;
+  var accs=mode==="replace"?[]:data.accounts.map(function(a){return{id:a.id,name:a.name,start:a.start,cur:a.cur}});
+  var byId={},byName={};
+  accs.forEach(function(a){byId[a.id]=1;byName[a.name.toLowerCase()]=a.id});
+  if(imp.accounts)imp.accounts.forEach(function(a){if(!byId[a.id]){accs.push({id:String(a.id),name:String(a.name).slice(0,30),start:+a.start||0,cur:(a.cur&&SYM[a.cur])?a.cur:D()});byId[a.id]=1;byName[String(a.name).toLowerCase()]=String(a.id)}});
+  function accFor(name){
+    if(!name)return null;var k=name.toLowerCase();if(byName[k])return byName[k];
+    var id=uid();accs.push({id:id,name:name.slice(0,30),start:0,cur:D()});byId[id]=1;byName[k]=id;return id;
+  }
+  var base=mode==="replace"?[]:data.txs.slice(),seen={};
+  base.forEach(function(t){seen[t.id]=1});
+  var added=0;
+  imp.txs.forEach(function(t){
+    if(t.id&&seen[t.id])return;
+    var id=t.id||uid();seen[id]=1;
+    var acc=(t.acc&&byId[t.acc])?t.acc:(accFor(t.accName)||(accs[0]&&accs[0].id)||null);
+    var to=t.type==="tr"?((t.to&&byId[t.to])?t.to:(accFor(t.toName)||acc)):undefined;
+    base.push({id:id,type:t.type,amount:t.amount,cur:t.cur,acc:acc,to:to,cat:t.cat,note:t.note,ts:t.ts});added++;
+  });
+  data.txs=base;data.accounts=accs;
+  normalize();save();ui.imp=null;ui.armed=null;
+  toast("Импортировано записей: "+added);render();
+}
+function saveFile(name,text,mime){
+  var blob=new Blob([text],{type:mime});
+  function dl(){
+    var url=URL.createObjectURL(blob),a=document.createElement("a");
+    a.href=url;a.download=name;document.body.appendChild(a);a.click();
+    setTimeout(function(){URL.revokeObjectURL(url);a.remove()},1500);
+  }
+  try{
+    var types=[mime,"text/plain"];
+    for(var i=0;i<types.length;i++){
+      var file=new File([text],name,{type:types[i]});
+      if(navigator.canShare&&navigator.canShare({files:[file]})){
+        navigator.share({files:[file],title:name}).catch(function(e){if(!e||e.name!=="AbortError")dl()});
+        return;
+      }
+    }
+  }catch(e){}
+  dl();
+}
+function exportCsv(){
+  var rows=["Дата;Тип;Категория;Сумма;Валюта;Счёт;На счёт;Заметка"];
+  function q(s){return'"'+String(s||"").replace(/"/g,'""')+'"'}
+  data.txs.slice().sort(function(a,b){return a.ts-b.ts}).forEach(function(t){
+    var d=new Date(t.ts),ds=d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+    rows.push([ds,t.type==="inc"?"Доход":t.type==="exp"?"Расход":"Перевод",q(t.type==="tr"?"Перевод":t.cat),String(t.amount).replace(".",","),t.cur,q(accName(t.acc)),t.type==="tr"?q(accName(t.to)):"",q(t.note)].join(";"));
+  });
+  saveFile("finance-"+todayStr()+".csv","\ufeff"+rows.join("\n"),"text/csv");
+}
+
+/* ---------- events ---------- */
+document.addEventListener("input",function(e){
+  var id=e.target.id,v=e.target.value;
+  if(id==="amt")wiz.amount=v;
+  else if(id==="cust")wiz.custom=v;
+  else if(id==="nt")wiz.note=v;
+  else if(id==="dt")wiz.date=v;
+  else if(id==="fname")form.name=v;
+  else if(id==="fstart")form.start=v;
+  else if(id==="tramt")form.amt=v;
+});
+document.addEventListener("change",function(e){
+  var id=e.target.id,v=e.target.value;
+  if(id==="wcur")wiz.cur=v;
+  else if(id==="trfrom")form.from=v;
+  else if(id==="trto")form.to=v;
+  else if(id==="scur"){data.settings.cur=v;save();render();toast("Валюта: "+v)}
+  else if(id==="file"){
+    var f=e.target.files&&e.target.files[0];if(!f)return;
+    var rd=new FileReader();
+    rd.onload=function(){
+      try{
+        var imp=parseImport(String(rd.result||""));
+        if(!imp.txs.length)throw new Error("empty");
+        ui.imp=imp;ui.armed=null;render();
+      }catch(err){toast("Не удалось прочитать файл")}
+    };
+    rd.onerror=function(){toast("Не удалось прочитать файл")};
+    rd.readAsText(f,"utf-8");
+    e.target.value="";
+  }
+});
+document.addEventListener("keydown",function(e){if(e.key==="Enter"&&e.target.id==="amt"){e.preventDefault();act("toCat")}});
+document.addEventListener("click",function(e){
+  var b=e.target.closest("[data-act]");if(!b||b.disabled)return;
+  act(b.getAttribute("data-act"),b.getAttribute("data-v"));
+});
+
+function arm(key){ui.armed=key;setTimeout(function(){if(ui.armed===key){ui.armed=null;render()}},3000);render()}
+
+function act(a,v){
+  if(a==="tab"){tab=v;ui.armed=null;if(v!=="acc")ui.form=null;if(v!=="set")ui.imp=null;render();return}
+  if(a==="ck"){cpress(v);updateCalcDOM();return}
+  if(a==="refresh"){toast("Обновляю…");refreshAll(true).then(function(){toast(M.fail?"Часть данных не загрузилась":"Обновлено")});return}
+  /* wizard */
+  if(a==="type"){wiz.type=v;wiz.step=1;wiz.cur=D();wiz.cat="";wiz.custom="";wiz.acc=data.accounts.some(function(x){return x.id===data.settings.lastAcc})?data.settings.lastAcc:data.accounts[0].id;render();return}
+  if(a==="back0"){wiz.step=0;render();return}
+  if(a==="back1"){wiz.step=1;render();return}
+  if(a==="toCat"){if(!(parseAmt(wiz.amount)>0)){toast("Введи сумму");return}wiz.step=2;render();return}
+  if(a==="cat"){
+    wiz.cat=v;wiz.custom="";var cu=document.getElementById("cust");if(cu)cu.value="";
+    var cs=document.querySelectorAll('[data-act="cat"]');for(var i=0;i<cs.length;i++)cs[i].classList.toggle("on",cs[i].getAttribute("data-v")===v);
+    return;
+  }
+  if(a==="wacc"){
+    wiz.acc=v;var as=document.querySelectorAll('[data-act="wacc"]');
+    for(var j=0;j<as.length;j++)as[j].classList.toggle("on",as[j].getAttribute("data-v")===v);
+    return;
+  }
+  if(a==="save"){
+    var cat=(wiz.custom||"").trim()||wiz.cat;if(!cat){toast("Выбери категорию");return}
+    var amount=parseAmt(wiz.amount);if(!(amount>0)){toast("Введи сумму");return}
+    var d=(wiz.date&&wiz.date!==todayStr())?new Date(wiz.date+"T12:00:00"):new Date();
+    if(isNaN(d.getTime()))d=new Date();
+    data.txs.push({id:uid(),type:wiz.type,amount:amount,cur:wiz.cur,acc:wiz.acc,cat:cat.slice(0,40),note:(wiz.note||"").trim().slice(0,120),ts:d.getTime()});
+    data.settings.lastAcc=wiz.acc;save();toast("Сохранено ✓");wiz=newWiz();render();return;
+  }
+  /* stats / history */
+  if(a==="prev"){view.off--;render();return}
+  if(a==="next"){if(view.off<0){view.off++;render()}return}
+  if(a==="kind"){view.kind=v;render();return}
+  if(a==="del"){
+    if(ui.armed===v){ui.armed=null;data.txs=data.txs.filter(function(t){return t.id!==v});save();render()}
+    else arm(v);
+    return;
+  }
+  /* accounts */
+  if(a==="accNew"){ui.form="new";form.name="";form.start="";render();return}
+  if(a==="accEdit"){
+    var ac=null;data.accounts.forEach(function(x){if(x.id===v)ac=x});if(!ac)return;
+    ui.form="edit:"+v;form.name=ac.name;form.start=ac.start?String(ac.start):"";ui.armed=null;render();return;
+  }
+  if(a==="accCancel"){ui.form=null;ui.armed=null;render();return}
+  if(a==="accSave"){
+    var name=(form.name||"").trim().slice(0,30);if(!name){toast("Введи название");return}
+    var st=parseNum(form.start);if(isNaN(st)){toast("Проверь остаток");return}
+    if(ui.form==="new"){data.accounts.push({id:uid(),name:name,start:st,cur:D()})}
+    else{var id=ui.form.slice(5);data.accounts.forEach(function(x){if(x.id===id){x.name=name;x.start=st}})}
+    save();ui.form=null;toast("Сохранено ✓");render();return;
+  }
+  if(a==="accDel"){
+    var did=ui.form.slice(5);
+    if(data.accounts.length<2){toast("Нужен хотя бы один счёт");return}
+    var used=data.txs.some(function(t){return t.acc===did||t.to===did});
+    if(used){toast("К счёту привязаны записи. Удалить нельзя");return}
+    if(ui.armed==="del"){data.accounts=data.accounts.filter(function(x){return x.id!==did});normalize();save();ui.form=null;ui.armed=null;toast("Счёт удалён");render()}
+    else arm("del");
+    return;
+  }
+  if(a==="trForm"){
+    if(data.accounts.length<2){toast("Для перевода нужно минимум 2 счёта");return}
+    ui.form="tr";form.from=data.accounts[0].id;form.to=data.accounts[1].id;form.amt="";render();return;
+  }
+  if(a==="trSave"){
+    var am=parseAmt(form.amt);if(!(am>0)){toast("Введи сумму");return}
+    if(form.from===form.to){toast("Выбери разные счета");return}
+    data.txs.push({id:uid(),type:"tr",amount:am,cur:D(),acc:form.from,to:form.to,cat:"Перевод",note:"",ts:Date.now()});
+    save();ui.form=null;toast("Переведено ✓");render();return;
+  }
+  /* settings */
+  if(a==="expJson"){saveFile("finance-backup-"+todayStr()+".json",JSON.stringify(data),"application/json");return}
+  if(a==="expCsv"){exportCsv();return}
+  if(a==="impPick"){var fi=document.getElementById("file");if(fi)fi.click();return}
+  if(a==="impCancel"){ui.imp=null;ui.armed=null;render();return}
+  if(a==="impMerge"){applyImport("merge");return}
+  if(a==="impReplace"){if(ui.armed==="rep")applyImport("replace");else arm("rep");return}
+}
+
+/* ---------- start ---------- */
+loadData();
+loadCaches();
+render();
+refreshAll(false);
+setInterval(function(){if(document.hidden)return;refreshBtc(false).then(function(){M.t=Date.now();saveMarket();softRender()}).catch(function(){})},60000);
+setInterval(function(){if(document.hidden)return;refreshFx(false).then(function(){saveMarket();softRender()}).catch(function(){})},30*60000);
+document.addEventListener("visibilitychange",function(){if(!document.hidden&&Date.now()-M.t>60000)refreshAll(false)});
+})();
+</script>
+</body>
+</html>
